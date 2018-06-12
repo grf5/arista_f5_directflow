@@ -1,0 +1,19 @@
+{
+  "jsonrpc": "2.0",
+  "method": "runCmds",
+  "params": {
+    "format": "json",
+    "timestamps": false,
+    "autoComplete": false,
+    "expandAliases": false,
+    "cmds": [
+      {
+        "cmd": "enable",
+        "input": "api"
+      },
+      "send log level debugging message \"TESTING\""
+    ],
+    "version": 1
+  },
+  "id": "EapiExplorer-1"
+}
