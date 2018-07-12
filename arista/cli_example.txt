@@ -1,0 +1,19 @@
+config t
+directflow
+flow testing
+no persistent
+timeout idle 30
+match source ip 192.168.200.2
+match destination ip 192.168.100.2
+action set vlan 4092
+action set destination mac 00:1c:73:2a:5f:10
+action output interface et6
+flow testing2
+no persistent
+timeout idle 30
+match destination ip 192.168.200.2
+match source ip 192.168.100.2
+action set vlan 4093
+action set destination mac 00:1c:73:2a:5f:10
+action output interface et5
+end
