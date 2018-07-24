@@ -19,7 +19,7 @@ ilx.listen();
   * @return {Boolean} result
   */
 ilx.addMethod('createDirectflowEntry', function(req, res) {
-	directflow.createDirectflowEntry(req.params()[0], function(result) {
+	directflow.createDirectflowEntry(req.params()[0], req.params()[1], req.params()[2], req.params()[3], req.params()[4], req.params()[5], function(result) {
 		if(typeof result !== undefined) {
 			res.reply(true);
 		} else {
