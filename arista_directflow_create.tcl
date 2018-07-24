@@ -1,64 +1,33 @@
-/*
-* create a directflow entry on Arista EOS
-*
-*/
-
-var rpc = require('node-json-rpc2');
-var exports = module.exports = {};
-
-/**
- * create directflow entry
- * 
- * @param {String} command
- * @return {Object} data
- */
-exports.createDirectflowEntry = function(flow_id, source_vlan, ip_protocol, source_address, destination_address, destination_port, callback) {
-    var options = {
-        port: 80,
-        host: '10.251.114.34',
-        path: '/command-api',
-        strict: true,
-        user: "f5test",
-        pass: "f5test"
-    };
-    var client = new rpc.Client(options);
-    client.call(
-        {
-            "jsonrpc":"2.0",
-            "method":"runCmds",
-            "params":{
-                "format":"json",
-                "timestamps":false,
-                "cmds":[
-                    "configure terminal",
-                    "directflow",
-                    "flow " + flow_id,
-                    "no persistent",
-                    "timeout idle 15",
-                    "match ip protocol " + ip_protocol,
-                    "match source ip " + source_address,
-                    "match destination ip " +  destination_address,
-                    "match destination port " + destination_port,
-                    "action set vlan 4093",
-                    "action set destination mac 00:1c:73:2a:5f:10",
-                    "action output interface et5",
-                    "flow " + flow_id + "-inverse",
-                    "no persistent",
-                    "timeout idle 15",
-                    "match ip protocol " + ip_protocol,
-                    "match source ip " + destination_address,
-                    "match destination ip " + source_address,
-                    "match source port " + destination_port,
-                    "action set vlan " + source_vlan,
-                    "action set destination mac 00:1c:73:2a:5f:10",
-                    "action output interface et6",
-                    "end"
-                    ],
-            "version":1
-            },
-            "id":"EapiExplorer-1"},
-        function(err, res) {
-            callback(err)
+when FLOW_INIT {
+    set ilx_handle [ILX::init "arista_directflow_create" "arista_directflow_create"]
+    if { [IP::protocol] == 6 } {
+        # TCP Handler
+        set flow_id [expr { int(100000000000 * rand()) }]
+        log local0. "TCP($flow_id):VLAN_[LINK::vlan_id]:SRCADDR_[IP::remote_addr]:SRCPORT_[TCP::remote_port]:DSTADDR_[IP::local_addr]:DSTPORT_[TCP::local_port]"
+        set ip_protocol "tcp"
+        set source_addr [IP::remote_addr]
+        set dest_addr [IP::local_addr]
+        set dest_port [TCP::local_port]
+        if { [catch { set res [ILX::call $ilx_handle "createDirectflowEntry" "$flow_id" "[LINK::vlan_id]" "$ip_protocol" "$source_addr" "$dest_addr" "$dest_port" ]} result]} {
+            log local0.error "ILX Failure: $result"
+            return
         }
-    );
-};
+    }
+    elseif { [IP::protocol] == 17 } {
+        # UDP Handler
+        set flow_id [expr { int(100000000000 * rand()) }]
+        log local0. "UDP($flow_ID):VLAN_[LINK::vlan_id]:SRCADDR_[IP::remote_addr]:SRCPORT_[UDP::remote_port]:DSTADDR_[IP::local_addr]:DSTPORT_[UDP::local_port]" 
+        set ip_protocol "udp"
+        set source_addr [IP::remote_addr]
+        set dest_addr [IP::local_addr]
+        set dest_port [UDP::local_port]
+        if { [catch { set res [ILX::call $ilx_handle "createDirectflowEntry" "$flow_id" "[LINK::vlan_id]" "$ip_protocol" "$source_addr" "$dest_addr" "$dest_port" ]} result]} {
+            log local0.error "ILX Failure: $result"
+            return
+        }        
+    }
+    else {
+        # Other protocols
+        log local0. "Ignoring unmatched IP protocol [IP::protocol] from [IP::remote_addr] to [IP::local_addr]"
+    }
+}
