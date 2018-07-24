@@ -1,19 +1,35 @@
 {
-  "jsonrpc": "2.0",
-  "method": "runCmds",
-  "params": {
-    "format": "json",
-    "timestamps": false,
-    "autoComplete": false,
-    "expandAliases": false,
-    "cmds": [
-      {
-        "cmd": "enable",
-        "input": "api"
-      },
-      "send log level debugging message \"TESTING\""
-    ],
-    "version": 1
-  },
-  "id": "EapiExplorer-1"
+            "jsonrpc":"2.0",
+            "method":"runCmds",
+            "params":{
+                "format":"json",
+                "timestamps":false,
+                "cmds":[
+                    "configure terminal",
+                    "directflow",
+                    "flow " + flow_id,
+                    "no persistent",
+                    "timeout idle 15",
+                    "match ip protocol " + ip_protocol,
+                    "match source ip " + source_address,
+                    "match destination ip " +  destination_address,
+                    "match destination port " + destination_port,
+                    "action set vlan 4093",
+                    "action set destination mac 00:1c:73:2a:5f:10",
+                    "action output interface et5",
+                    "flow " + flow_id + "-inverse",
+                    "no persistent",
+                    "timeout idle 15",
+                    "match ip protocol " + ip_protocol,
+                    "match source ip " + destination_address,
+                    "match destination ip " + source_address,
+                    "match source port " + destination_port,
+                    "action set vlan " + source_vlan,
+                    "action set destination mac 00:1c:73:2a:5f:10",
+                    "action output interface et6",
+                    "end"
+                    ],
+            "version":1
+            },
+            "id":"EapiExplorer-1"
 }
