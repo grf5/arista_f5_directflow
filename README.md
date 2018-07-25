@@ -12,4 +12,7 @@ Direct Flow integration with F5 BIG-IP's AFM module
  7. '/var/ilx/workspaces/Common/arista_directflow_create/extensions/arista_directflow_create/'
  8. 'npm install node-json-rpc2'
  9. **MOST IMPORTANT: review the files and update IP addresses, ports and user credentials as necessary.**
- 10. Assign your iRule to AFM rule(s).
+10. Create the LX plug-in called "arista_directflow_create" and assign the new workspace. Save.
+11. Assign your iRule to AFM rule(s).
+
+See examples in the **arista** folder.
