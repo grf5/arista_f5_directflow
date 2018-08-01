@@ -1,0 +1,16 @@
+{
+  "name": "arista_directflow_create",
+  "version": "0.1a",
+  "description": "Cache AFM decisions in Arista hardware via Direct Flow",
+  "main": "index.js",
+  "directories": {
+  },
+  "scripts": {
+  },
+  "author": "Greg Robinson",
+  "license": "MIT",
+  "dependencies": {
+    "node-json-rpc2": "^1.8.0",
+    "f5-nodejs": 6.9.1
+  }
+}
