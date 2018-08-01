@@ -1,0 +1,53 @@
+interface Ethernet1
+   description f5_internal
+   no switchport
+   vrf forwarding f5_internal
+   ip address 192.168.200.2/24
+   ipv6 enable
+   ipv6 address 192:168:200::2/48
+!
+interface Ethernet2
+   description f5_external
+   no switchport
+   vrf forwarding f5_external
+   ip address 192.168.100.2/24
+   ipv6 enable
+   ipv6 address 192:168:100::2/48
+!
+interface Ethernet5
+   description f5_int_host
+   no switchport
+   vrf forwarding f5_internal
+   ip address 192.168.201.1/24
+   ipv6 enable
+   ipv6 address 192:168:201::1/48
+!
+interface Ethernet6
+   description f5_ext_host
+   no switchport
+   vrf forwarding f5_external
+   ip address 192.168.101.1/24
+   ipv6 enable
+   ipv6 address 192:168:101::1/48
+!
+directflow
+   no shutdown
+!
+ip route vrf f5_internal 0.0.0.0/0 192.168.200.1
+ip route vrf f5_external 0.0.0.0/0 192.168.100.1
+!
+ipv6 route vrf f5_internal ::/0 192:168:200::1
+ipv6 route vrf f5_external ::/0 192:168:100::1
+!
+ip routing vrf f5_internal
+ip routing vrf f5_external
+!
+ipv6 unicast-routing vrf f5_internal
+ipv6 unicast-routing vrf f5_external
+!
+management api http-commands
+   protocol http
+   no shutdown
+   vrf MGMT
+      no shutdown
+!
