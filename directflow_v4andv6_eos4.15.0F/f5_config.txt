@@ -1,0 +1,255 @@
+# BIG-IP 13.1.0.7 build 0.0.1
+# This configuration not meant to be cut/paste in entirety but to serve as an example
+
+ilx plugin arista_directflow_create {
+    extensions {
+        arista_directflow_create { }
+    }
+    from-workspace arista_directflow_create
+    log-publisher local-db-publisher
+    node-version 6.9.1
+    staged-directory /var/ilx/workspaces/Common/arista_directflow_create
+}
+ilx plugin arista_directflow_createv6 {
+    extensions {
+        arista_directflow_createv6 { }
+    }
+    from-workspace arista_directflow_createv6
+    log-publisher local-db-publisher
+    node-version 6.9.1
+    staged-directory /var/ilx/workspaces/Common/arista_directflow_createv6
+}
+ilx workspace arista_directflow_create {
+    extensions {
+        arista_directflow_create {
+            files {
+                directflow.js { }
+                index.js { }
+                node_modules { }
+                package.json { }
+            }
+        }
+    }
+    node-version 6.9.1
+    partition none
+    rules {
+        arista_directflow_create { }
+    }
+    staged-directory /var/ilx/workspaces/Common/arista_directflow_create
+    version 13.1.0.7
+}
+ilx workspace arista_directflow_createv6 {
+    extensions {
+        arista_directflow_createv6 {
+            files {
+                directflow.js { }
+                index.js { }
+                node_modules { }
+                package.json { }
+            }
+        }
+    }
+    node-version 6.9.1
+    partition none
+    rules {
+        arista_directflow_createv6 { }
+    }
+    staged-directory /var/ilx/workspaces/Common/arista_directflow_createv6
+    version 13.1.0.7
+}
+ltm virtual IPV4_ANY {
+    destination 0.0.0.0:any
+    fw-enforced-policy rd1_arista
+    ip-forward
+    mask any
+    profiles {
+        fastL4 { }
+    }
+    source 0.0.0.0/0
+    translate-address disabled
+    translate-port disabled
+    vs-index 10
+}
+ltm virtual IPV4_TCP {
+    destination 0.0.0.0:any
+    fw-enforced-policy rd1_arista
+    ip-forward
+    ip-protocol tcp
+    mask any
+    profiles {
+        fastL4 { }
+    }
+    source 0.0.0.0/0
+    translate-address disabled
+    translate-port disabled
+    vs-index 11
+}
+ltm virtual IPV4_UDP {
+    destination 0.0.0.0:any
+    fw-enforced-policy rd1_arista
+    ip-forward
+    ip-protocol udp
+    mask any
+    profiles {
+        fastL4 { }
+    }
+    source 0.0.0.0/0
+    translate-address disabled
+    translate-port disabled
+    vs-index 12
+}
+ltm virtual IPV6_ANY {
+    destination ::.any
+    fw-enforced-policy rd1_arista
+    ip-forward
+    mask any6
+    profiles {
+        fastL4 { }
+    }
+    translate-address disabled
+    translate-port disabled
+    vs-index 13
+}
+ltm virtual IPV6_TCP {
+    destination ::.any
+    fw-enforced-policy rd1_arista
+    ip-forward
+    ip-protocol tcp
+    mask any6
+    profiles {
+        fastL4 { }
+    }
+    translate-address disabled
+    translate-port disabled
+    vs-index 14
+}
+ltm virtual IPV6_UDP {
+    destination ::.any
+    fw-enforced-policy rd1_arista
+    ip-forward
+    ip-protocol udp
+    mask any6
+    profiles {
+        fastL4 { }
+    }
+    translate-address disabled
+    translate-port disabled
+    vs-index 15
+}
+net route f5_external_host_v4 {
+    gw 192.168.100.2
+    network 192.168.101.0/24
+}
+net route f5_external_host_v6 {
+    gw 192:168:100::2
+    network 192:168:101::/48
+}
+net route f5_internal_host_v4 {
+    gw 192.168.200.2
+    network 192.168.201.0/24
+}
+net route f5_internal_host_v6 {
+    gw 192:168:200::2
+    network 192:168:201::/48
+}
+net route-domain 0 {
+    id 0
+    vlans {
+        arista_internal
+        http-tunnel
+        socks-tunnel
+        arista_external
+    }
+}
+net self arista_internal-v6 {
+    address 192:168:200::1/48
+    allow-service all
+    traffic-group traffic-group-local-only
+    vlan arista_internal
+}
+net self arista_external-v6 {
+    address 192:168:100::1/48
+    allow-service all
+    traffic-group traffic-group-local-only
+    vlan arista_external
+}
+net self arista_external {
+    address 192.168.100.1/24
+    allow-service all
+    traffic-group traffic-group-local-only
+    vlan arista_external
+}
+net self arista_internal {
+    address 192.168.200.1/24
+    allow-service all
+    traffic-group traffic-group-local-only
+    vlan arista_internal
+}
+net vlan arista_external {
+    fwd-mode l3
+    if-index 528
+    interfaces {
+        2.4 { }
+    }
+    sflow {
+        poll-interval-global no
+        sampling-rate-global no
+    }
+    tag 4092
+}
+net vlan arista_internal {
+    fwd-mode l3
+    if-index 512
+    interfaces {
+        2.3 { }
+    }
+    sflow {
+        poll-interval-global no
+        sampling-rate-global no
+    }
+    tag 4093
+}
+security firewall policy rd1_arista {
+    rules {
+        allowall {
+            action accept-decisively
+            log yes
+            status disabled
+        }
+        sshv6_allow {
+            action accept-decisively
+            ip-protocol tcp
+            irule /Common/arista_directflow_createv6/arista_directflow_createv6
+            log yes
+            destination {
+                addresses {
+                    ::/0 { }
+                }
+                ports {
+                    ssh { }
+                }
+            }
+            source {
+                addresses {
+                    ::/0 { }
+                }
+            }
+        }
+        ssh_allow {
+            action accept-decisively
+            ip-protocol tcp
+            irule /Common/arista_directflow_create/arista_directflow_create
+            log yes
+            destination {
+                ports {
+                    ssh { }
+                }
+            }
+        }
+        icmp_allow {
+            action accept-decisively
+            ip-protocol icmp
+            log yes
+        }
+    }
+}
