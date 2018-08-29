@@ -15,11 +15,11 @@ var exports = module.exports = {};
 exports.createDirectflowEntry = function(flow_id, source_vlan, ip_protocol, source_address, destination_address, destination_port, callback) {
     var options = {
         port: 80,
-        host: '10.251.114.34',
+        host: '192.168.1.10',
         path: '/command-api',
         strict: true,
         user: "f5test",
-        pass: "f5test"
+        pass: "mypassword"
     };
     var client = new rpc.Client(options);
     client.call(
@@ -39,7 +39,7 @@ exports.createDirectflowEntry = function(flow_id, source_vlan, ip_protocol, sour
                     "match source ip " + source_address,
                     "match destination ip " +  destination_address,
                     "match destination port " + destination_port,
-                    "action set destination mac 00:1c:73:2a:5f:10",
+                    "action set destination mac 1a:2b:3c:4d:5e:6f",
                     "action set vlan 1016",
                     "action output interface Ethernet 5",
                     "flow " + flow_id + "-inverse",
@@ -49,7 +49,7 @@ exports.createDirectflowEntry = function(flow_id, source_vlan, ip_protocol, sour
                     "match source ip " + destination_address,
                     "match destination ip " + source_address,
                     "match source port " + destination_port,
-                    "action set destination mac 00:1c:73:2a:5f:10",
+                    "action set destination mac aa:bb:cc:11:22:33",
                     "action set vlan 1017",
                     "action output interface Ethernet 6",
                     "end"
